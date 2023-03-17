@@ -1,4 +1,4 @@
-module github.com/geekykant/aslipaydekho
+module github.com/geekykant/aslipaydekho/scraper
 
 go 1.19
 

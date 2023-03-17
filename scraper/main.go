@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/geekykant/aslipaydekho/model"
-	"github.com/geekykant/aslipaydekho/utils"
+	"github.com/geekykant/aslipaydekho/scraper/model"
+	"github.com/geekykant/aslipaydekho/scraper/utils"
 	"github.com/sethgrid/pester"
 )
 
