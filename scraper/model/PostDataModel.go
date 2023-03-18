@@ -1,5 +1,14 @@
 package model
 
+import (
+	"fmt"
+	"reflect"
+	"regexp"
+	"strings"
+
+	"github.com/geekykant/aslipaydekho/scraper/utils"
+)
+
 type DataNode struct {
 	Data Data `json:"data"`
 }
@@ -55,4 +64,33 @@ type OfferLetter struct {
 	TotalCompensation        string
 	Benefits                 string
 	OtherDetails             string
+}
+
+func ParsePostContent(post *Post) OfferLetter {
+	offer := OfferLetter{}
+	attrPatterns := utils.GetOfferLetterParsingPattern()
+
+	for field, pattern := range attrPatterns {
+		re := regexp.MustCompile(pattern)
+		match := re.FindStringSubmatch(post.PostContent)
+		if match != nil {
+			fieldValue := reflect.ValueOf(&offer).Elem().FieldByName(field)
+			fieldValue.SetString(strings.TrimSpace(match[1]))
+		}
+	}
+
+	return offer
+}
+
+func PrintOfferLetter(offerLetter *OfferLetter) {
+	value := reflect.ValueOf(offerLetter)
+
+	// Iterate over each field of the struct
+	for i := 0; i < value.NumField(); i++ {
+		field := value.Field(i)
+		fieldName := value.Type().Field(i).Name
+
+		// Print the field name and value
+		fmt.Printf("%s: %v\n", fieldName, field.Interface())
+	}
 }

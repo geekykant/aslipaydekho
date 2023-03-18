@@ -21,3 +21,5 @@
 content-data.json
 samples/
 scrape.py
+
+.env
