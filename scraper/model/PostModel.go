@@ -66,6 +66,12 @@ type OfferLetter struct {
 	OtherDetails             string
 }
 
+type PostAndOfferLetter struct {
+	PostUrl           string      `json:"url"`
+	OriginalPost      Post        `json:"post"`
+	ParsedOfferLetter OfferLetter `json:"offerLetter"`
+}
+
 func ParsePostContent(post *Post) OfferLetter {
 	offer := OfferLetter{}
 	attrPatterns := utils.GetOfferLetterParsingPattern()

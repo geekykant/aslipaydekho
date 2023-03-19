@@ -21,5 +21,6 @@
 content-data.json
 samples/
 scrape.py
+local-test/
 
 .env

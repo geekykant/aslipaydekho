@@ -1,0 +1,23 @@
+version: "3.9"
+
+services:
+  message-broker:
+    image: rabbitmq:3.8.25-management-alpine
+    container_name: scraper-message-broker
+    ports:
+      - 5672:5672   # for sender and consumer connections
+      - 15672:15672 # for serve RabbitMQ GUI
+    volumes:
+      - ${HOME}/dev-rabbitmq/data/:/var/lib/rabbitmq
+      - ${HOME}/dev-rabbitmq/log/:/var/log/rabbitmq
+    healthcheck:
+      test: [ "CMD", "nc", "-z", "localhost", "5672" ]
+      interval: 5s
+      timeout: 15s
+      retries: 1
+    networks:
+      - aslipaydekho-network
+
+networks:
+  aslipaydekho-network:
+    driver: bridge
