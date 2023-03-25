@@ -4,6 +4,7 @@ services:
   message-broker:
     image: rabbitmq:3.8.25-management-alpine
     container_name: scraper-message-broker
+    hostname: my-scraper-rabbit
     ports:
       - 5672:5672   # for sender and consumer connections
       - 15672:15672 # for serve RabbitMQ GUI

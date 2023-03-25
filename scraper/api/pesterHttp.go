@@ -1,4 +1,4 @@
-package fetchapi
+package api
 
 import (
 	"sync"

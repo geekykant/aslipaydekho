@@ -9,6 +9,12 @@ import (
 	"github.com/geekykant/aslipaydekho/scraper/utils"
 )
 
+type GraphqlRequest struct {
+	OperationName string                 `json:"operationName"`
+	Query         string                 `json:"query"`
+	Variables     map[string]interface{} `json:"variables"`
+}
+
 type DataNode struct {
 	Data Data `json:"data"`
 }
@@ -18,7 +24,8 @@ type Data struct {
 }
 
 type CategoryTopicList struct {
-	Edges []Edge `json:"edges"`
+	Edges    []Edge `json:"edges"`
+	TotalNum uint16 `json:"totalNum"`
 }
 
 type Edge struct {

@@ -9,5 +9,5 @@ import (
 func SetHttpReqConfig(client *pester.Client) {
 	client.Backoff = pester.ExponentialBackoff
 	client.MaxRetries = 3
-	client.Timeout = 30 * time.Second
+	client.Timeout = 10 * time.Second
 }
