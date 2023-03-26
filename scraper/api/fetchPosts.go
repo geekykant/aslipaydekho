@@ -67,12 +67,12 @@ func InitPopulateAllCompensationsToMQ() {
 	}
 
 	for i := 0; i < int(totalCompensationPostCount); i++ {
-		_ = <-ch
+		paol := <-ch
 		// Insert both - Parsed, Unparsed into MQ
-		// err := SendOfferLetterToMQ(&paol)
-		// if err != nil {
-		// 	panic(err)
-		// }
+		err := SendOfferLetterToMQ(&paol)
+		if err != nil {
+			panic(err)
+		}
 	}
 }
 

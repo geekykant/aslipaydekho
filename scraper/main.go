@@ -37,20 +37,20 @@ func main() {
 }
 
 func runCronJobs() {
-	scheduler := gocron.NewScheduler(time.UTC)
-	scheduler.Every(1).Week().Do(runWeeklyCronTask)
+	scheduler := gocron.NewScheduler(time.Local)
+	fmt.Println(time.Now())
+	scheduler.Every(1).Monday().At("05:00").Do(runWeeklyCronTask)
 	scheduler.StartBlocking()
 }
 
 func runWeeklyCronTask() {
-	// Create a RabbitMQ connection.
 	rabbitMQInstance, err := api.GetRabbitMQInstance()
 	if err != nil {
 		panic(err)
 	}
 	defer rabbitMQInstance.Close()
 
-	fmt.Println("[*] Grabbing weekly cron task at - " + time.Now().Format(time.ANSIC))
+	fmt.Println("[*] Starting weekly cron task at - " + time.Now().Format(time.ANSIC))
 	api.FetchPopulateCompensationsSinceLastWeek()
 	fmt.Println("[*] Done cron task.")
 }
