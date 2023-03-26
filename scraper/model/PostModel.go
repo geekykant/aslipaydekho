@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/geekykant/aslipaydekho/scraper/utils"
 )
@@ -33,14 +34,20 @@ type Edge struct {
 }
 
 type Node struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
-	Post Post   `json:"post"`
+	ID   string    `json:"id"`
+	Name string    `json:"name"`
+	Post PostInput `json:"post"`
 }
 
-type Post struct {
-	ID          string `json:"-"`
-	PostContent string `json:"content"`
+type PostInput struct {
+	ID           string `json:"-"`
+	CreationDate int64  `json:"creationDate"`
+	PostContent  string `json:"content"`
+}
+type PostOutput struct {
+	ID           string    `json:"id"`
+	CreationDate time.Time `json:"creationDate"`
+	PostContent  string    `json:"content"`
 }
 
 // Education: Tier 1 College
@@ -75,11 +82,11 @@ type OfferLetter struct {
 
 type PostAndOfferLetter struct {
 	PostUrl           string      `json:"url"`
-	OriginalPost      Post        `json:"post"`
+	OriginalPost      PostOutput  `json:"post"`
 	ParsedOfferLetter OfferLetter `json:"offerLetter"`
 }
 
-func ParsePostContent(post *Post) OfferLetter {
+func ParsePostContent(post *PostInput) OfferLetter {
 	offer := OfferLetter{}
 	attrPatterns := utils.GetOfferLetterParsingPattern()
 

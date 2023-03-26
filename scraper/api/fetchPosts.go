@@ -5,10 +5,52 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"time"
 
 	"github.com/geekykant/aslipaydekho/scraper/model"
 	"github.com/geekykant/aslipaydekho/scraper/utils"
 )
+
+func FetchPopulateCompensationsSinceLastWeek() error {
+	lastFetchedTime := time.Now().AddDate(0, 0, -7) //last 7 days (1 week)
+
+	batchFetchCount := uint16(500)
+	reqPostOffset := uint16(0)
+
+	//Counter to skip sticky posts (interferes with its old date)
+	counterBeforeLeaving := 3
+
+	for {
+		paolList, err := FetchCompensationPostsInRange(reqPostOffset, batchFetchCount)
+		if err != nil {
+			err = fmt.Errorf("Error while fetching - " + err.Error())
+			return err
+		}
+
+		if len(paolList) == 0 {
+			return nil
+		}
+
+		for _, paol := range paolList {
+			if paol.OriginalPost.CreationDate.Before(lastFetchedTime) {
+				counterBeforeLeaving--
+				if counterBeforeLeaving == 0 {
+					return nil
+				}
+				continue
+			}
+
+			// Insert both - Parsed, Unparsed into MQ
+			err := SendOfferLetterToMQ(&paol)
+			if err != nil {
+				panic(err)
+			}
+			// fmt.Printf("fetched post created on %s \n", paol.OriginalPost.CreationDate)
+		}
+
+		reqPostOffset += batchFetchCount
+	}
+}
 
 func InitPopulateAllCompensationsToMQ() {
 	totalCompensationPostCount, err := fetchCompensationPostsCount()
@@ -16,21 +58,21 @@ func InitPopulateAllCompensationsToMQ() {
 		panic("Aiyoo error - Couldn't get the total compensation post count - " + err.Error())
 	}
 
-	fmt.Printf("Found totalPostCount: %d \n", totalCompensationPostCount)
+	fmt.Printf("[*] Found Total Compensations Posts: %d \n", totalCompensationPostCount)
 
 	//Create a channel to listen on go routine calls
-	ch := make(chan model.PostAndOfferLetter)
+	ch := make(chan model.PostAndOfferLetter, 1)
 	if err := FetchAllCompensationPosts(ch, totalCompensationPostCount); err != nil {
 		panic("Error occoured" + err.Error())
 	}
 
 	for i := 0; i < int(totalCompensationPostCount); i++ {
-		paol := <-ch
+		_ = <-ch
 		// Insert both - Parsed, Unparsed into MQ
-		err := SendOfferLetterToMQ(&paol)
-		if err != nil {
-			panic(err)
-		}
+		// err := SendOfferLetterToMQ(&paol)
+		// if err != nil {
+		// 	panic(err)
+		// }
 	}
 }
 
@@ -47,8 +89,8 @@ func FetchAllCompensationPosts(ch chan model.PostAndOfferLetter, totalCompensati
 			}
 
 			fmt.Printf("fetched %d to %d - totalCount - %d \n", offset, offset+reqCount, len(paolList))
-			for _, val := range paolList {
-				ch <- val
+			for _, paol := range paolList {
+				ch <- paol
 			}
 
 		}(reqPostOffset, reqPostCount)
@@ -71,10 +113,14 @@ func FetchCompensationPostsInRange(reqPostOffset uint16, reqPostCount uint16) ([
 
 		//Basic cleans post content - removing markdowns
 		postAndOfferLetter.PostUrl = fmt.Sprintf("https://leetcode.com/discuss/compensation/" + allPosts[i].ID)
-		postAndOfferLetter.OriginalPost = allPosts[i]
-		utils.BasicCleanCompensationPostContent(&allPosts[i].PostContent)
+		postAndOfferLetter.OriginalPost = model.PostOutput{
+			ID:           allPosts[i].ID,
+			CreationDate: utils.GetDateTimeFromEpochMillis(allPosts[i].CreationDate),
+			PostContent:  allPosts[i].PostContent,
+		}
 
-		//Parsing begins - to extract useful details from the post
+		//Cleaning & Parsing begins - to extract useful details from the post
+		utils.BasicCleanCompensationPostContent(&allPosts[i].PostContent)
 		postAndOfferLetter.ParsedOfferLetter = model.ParsePostContent(&allPosts[i])
 
 		allPostAndOfferLetters[i] = *postAndOfferLetter
@@ -83,7 +129,7 @@ func FetchCompensationPostsInRange(reqPostOffset uint16, reqPostCount uint16) ([
 	return allPostAndOfferLetters, nil
 }
 
-func fetchCompensationPosts(reqPostOffset uint16, reqPostCount uint16) ([]model.Post, error) {
+func fetchCompensationPosts(reqPostOffset uint16, reqPostCount uint16) ([]model.PostInput, error) {
 	client := GetPesterCientInstance()
 	url := "https://leetcode.com/graphql"
 	variables := map[string]interface{}{
@@ -137,7 +183,7 @@ func fetchCompensationPosts(reqPostOffset uint16, reqPostCount uint16) ([]model.
 	}
 
 	fetchedPostsCount := len(respData.Data.CategoryTopicList.Edges)
-	allPosts := make([]model.Post, fetchedPostsCount)
+	allPosts := make([]model.PostInput, fetchedPostsCount)
 
 	for i := 0; i < fetchedPostsCount; i++ {
 		post_meta := respData.Data.CategoryTopicList.Edges[i].Node

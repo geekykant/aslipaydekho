@@ -4,7 +4,7 @@ services:
   message-broker:
     image: rabbitmq:3.8.25-management-alpine
     container_name: scraper-message-broker
-    hostname: my-scraper-rabbit
+    hostname: scraper-rabbit
     ports:
       - 5672:5672   # for sender and consumer connections
       - 15672:15672 # for serve RabbitMQ GUI
@@ -18,6 +18,11 @@ services:
       retries: 1
     networks:
       - aslipaydekho-network
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USERNAME}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD}
+    env_file:
+      - .env
 
 networks:
   aslipaydekho-network:
