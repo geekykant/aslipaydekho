@@ -9,4 +9,4 @@ COPY . .
 
 RUN go build -o main .
 
-CMD ["./main", ["-task=runcrons"]]
+CMD ["./main", "-task=runcrons"]
