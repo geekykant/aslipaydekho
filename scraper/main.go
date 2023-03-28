@@ -6,15 +6,20 @@ import (
 	"time"
 
 	"github.com/geekykant/aslipaydekho/scraper/api"
+	"github.com/geekykant/aslipaydekho/scraper/utils"
 	"github.com/go-co-op/gocron"
-	"github.com/joho/godotenv"
 )
 
 func main() {
-	//loading env variables
-	if err := godotenv.Load(); err != nil {
-		panic("Error loading .env file")
+	//Checks required env variables
+	if !utils.CheckAllEnvVarsPresent() {
+		panic("Exiting. Required env values missing")
 	}
+
+	// //Loading .env variables
+	// if err := godotenv.Load(); err != nil {
+	// 	panic("Error loading .env file")
+	// }
 
 	//Defining flags for command line
 	var task string
@@ -39,7 +44,8 @@ func main() {
 func runCronJobs() {
 	scheduler := gocron.NewScheduler(time.Local)
 	fmt.Println(time.Now())
-	scheduler.Every(1).Monday().At("05:00").Do(runWeeklyCronTask)
+	fmt.Println("[*] Weekly cron scheduled for - 05:00 every sunday.")
+	scheduler.Every(1).Sunday().At("05:00").Do(runWeeklyCronTask)
 	scheduler.StartBlocking()
 }
 
