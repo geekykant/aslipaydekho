@@ -1,21 +1,23 @@
 <template>
-  <footer>
+  <div id="main-footer">
     <p class="footer-content">
       <span>©</span> AsliPayDekho
     </p>
-  </footer>
+  </div>
 </template>
 
 
-<style>
-footer {
-  background-color: white;
+<style scoped>
+#main-footer{
+  border-top: 2px solid #eeeeee;
+}
+
+* {
   margin: 0 auto;
   width: 100%;
   text-align: center;
   vertical-align: baseline;
-  font-weight: 300;
-  box-shadow: 0px -1px 2px 0.5px rgb(0 0 0 / 10%)
+  background-color: white;
 }
 
 .footer-content{

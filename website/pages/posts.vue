@@ -1,7 +1,7 @@
 <template>
-  <div>
-    <h1>post {{ postId }}</h1>
-  </div>
+    <div>
+        All posts page
+    </div>
 </template>
 
 <script setup>

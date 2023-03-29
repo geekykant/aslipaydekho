@@ -1,14 +1,11 @@
 <template>
   <div class="content-wrapper">
-    Add content here...
+      <ScrapperMQStats/>
   </div>
 </template>
 
-<script lang="ts">
+<script>
 </script>
 
-<style>
-  .content-wrapper {
-      margin: 40px 20px;
-  }
+<style scoped>
 </style>

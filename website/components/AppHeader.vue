@@ -1,30 +1,50 @@
 <template>
-    <a-layout-header id="main-header">
-      <nav id="main-nav">
-        <ul>
-          <li><NuxtLink to="/">Home</NuxtLink></li>
-          <li><NuxtLink to="/about">About</NuxtLink></li>
-          <li><NuxtLink to="/posts/1">Post1</NuxtLink></li>
-          <li><NuxtLink to="/posts/2">Post2</NuxtLink></li>
-        </ul>
-      </nav>
+  <nav id="main-nav">
+    <n-space justify="space-between">
       <div>
+          <span><nuxt-link to="/">Home</nuxt-link></span>
+          <span><nuxt-link to="/about">About</nuxt-link></span>
+          <span><nuxt-link to="/posts/">All Posts</nuxt-link></span>
+          <span><nuxt-link to="/posts/edit">Edit Post</nuxt-link></span>
       </div>
-    </a-layout-header>
+      <div style="vertical-align: middle; display: flex;">
+        <span>👋 {{ todaysDate }}</span>
+        <user-login-logout-dropdown/>
+      </div>
+    </n-space>
+  </nav>
 </template>
 
-<script setup lang="ts">
+<script lang="ts">
 let websiteTitle: string = "AsliPayDekho";
 useHead({
   titleTemplate: (titleChunk) => {
     return titleChunk ? `${titleChunk} - ${websiteTitle}` : websiteTitle;
   },
 });
+
+export default{
+  data() {
+    return {
+      todaysDate: new Date().toLocaleTimeString()
+    }
+  },
+  mounted(){
+    setInterval(() => {
+      this.todaysDate = new Date().toLocaleTimeString()
+    }, 1000)
+  }
+}
+
 </script>
 
 <style scoped>
+  *{
+    background-color: white;
+  }
+
   a {
-    color: rgb(0,0,0,0.7);
+    color: #546e7a
   }
 
   a:hover {
@@ -37,24 +57,13 @@ useHead({
     font-weight: 700;
   }
 
- nav > ul {
-    display: flex;
-    justify-content: start;
-    list-style-type: none
+  nav {
+    padding: 10px 50px;
+    border-bottom: 2px solid #eeeeee;
   }
 
-  li {
+  span {
     margin: 0 15px;
-    font-size: 15px;
-  }
-
-  header {
-    background: white;
-    box-shadow: 0px 2px 10px 1px rgb(0 0 0 / 10%);
-  }
-
-  .ant-layout-header{
-    height: 54px;
-    line-height: 54px;
+    font-size: 14px;
   }
 </style>

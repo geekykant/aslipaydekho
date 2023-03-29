@@ -1,3 +1,3 @@
 export default defineNuxtConfig({
-  plugins: ["@/plugins/antd"],
+  plugins: ["plugins/naive.ts"],
 });
