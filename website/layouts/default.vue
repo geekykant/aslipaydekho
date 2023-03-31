@@ -1,12 +1,25 @@
 <template>
   <div>
-    <client-only placeholder="loading..">
-      <AppHeader/>
-        <slot />
-      <AppFooter/>
-   </client-only>
+    <n-config-provider :theme="darkTheme">
+      <client-only placeholder="loading..">
+        <AppHeader/>
+          <slot />
+        <AppFooter/>
+    </client-only>
+   </n-config-provider>
   </div>
 </template>
+
+<script>
+import { lightTheme } from 'naive-ui'
+export default defineComponent({
+  setup() {
+    return {
+      lightTheme
+    }
+  }
+})
+</script>
 
 <style>
 body {
