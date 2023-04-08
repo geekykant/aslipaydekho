@@ -44,7 +44,7 @@ func main() {
 func runCronJobs() {
 	scheduler := gocron.NewScheduler(time.Local)
 	fmt.Println(time.Now())
-	fmt.Println("[*] Weekly cron scheduled for - 05:00 every sunday.")
+	fmt.Println("[*] Weekly cron scheduled for - 18:00 every sunday.")
 	scheduler.Every(1).Sunday().At("18:00").Do(runWeeklyCronTask)
 	scheduler.StartBlocking()
 }
